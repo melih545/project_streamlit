@@ -5,13 +5,12 @@ from streamlit_ydata_profiling import st_profile_report
 
 from prophet import Prophet
 from prophet.plot import plot_plotly
-import plotly.graph_objects as go
 from openpyxl import load_workbook
 from dateutil.relativedelta import relativedelta
 
-from statsmodels.tsa.statespace.sarimax import SARIMAX
 
-data_path = "/mnt/c/Users/edipm/Desktop/Ders/3. Sınıf/Advanced Spreadsheet/Project/project_copy.xlsm"
+data_path = "project_copy.xlsm"
+# data_path = "/mnt/c/Users/edipm/Desktop/Ders/3. Sınıf/Advanced Spreadsheet/Project/project_copy.xlsm"
 
 workbook = load_workbook(filename=data_path, read_only=True)
 sheet = workbook['Düzenlenmiş Veri Tablosu']
