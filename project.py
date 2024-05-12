@@ -69,7 +69,7 @@ month_num_dict = {
 }
 
 
-option = st.sidebar.radio("Menüler", ["Analiz", "Veri Tahmini"])
+option = st.sidebar.radio("Seçenekler", ["Analiz", "Veri Tahmini"])
 
 if option == "Analiz":
     st.title("Altınay Savunma Teknolojileri Gelir Gider Analizi")
