@@ -10,8 +10,9 @@ from prophet.plot import plot_plotly
 from dateutil.relativedelta import relativedelta
 
 
-# data_path = "project.xlsm"
-data_path = "/mnt/c/Users/edipm/Desktop/Ders/3. Sınıf/Advanced Spreadsheet/Project/project.xlsm"
+
+data_path = "project.xlsm"
+# data_path = "/mnt/c/Users/edipm/Desktop/Ders/3. Sınıf/Advanced Spreadsheet/Project/project.xlsm"
 
 workbook = load_workbook(filename=data_path, read_only=True)
 sheet = workbook["Düzenlenmiş Veri Tablosu"]
