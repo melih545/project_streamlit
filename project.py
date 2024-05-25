@@ -11,8 +11,8 @@ from dateutil.relativedelta import relativedelta
 
 
 
-data_path = "project.xlsm"
-# data_path = "/mnt/c/Users/edipm/Desktop/Ders/3. Sınıf/Advanced Spreadsheet/Project/project.xlsm"
+#data_path = "project.xlsm"
+data_path = "/mnt/c/Users/edipm/Desktop/Ders/3. Sınıf/Advanced Spreadsheet/Project/project.xlsm"
 
 workbook = load_workbook(filename=data_path, read_only=True)
 sheet = workbook["Düzenlenmiş Veri Tablosu"]
@@ -70,7 +70,7 @@ month_num_dict = {
 }
 
 
-option = st.sidebar.radio("Seçenekler", ["Analiz", "Veri Tahmini"])
+option = st.sidebar.radio("Seçenekler", ["Analiz", "Filtreleme", "Veri Tahmini"])
 
 if option == "Analiz":
     st.title("Altınay Savunma Teknolojileri Gelir Gider Analizi")
@@ -103,11 +103,15 @@ if option == "Veri Tahmini":
     months = (12 * years) + month
 
     if forecast_type == "Gelir":
+        table_name = "Gelir Tahmini"
+        y_name = "Gelir"
         model = Prophet(yearly_seasonality=True, seasonality_prior_scale=0.1, seasonality_mode='multiplicative')
         forecast_df = df[df["Tür"] == "Gelir"]
         forecast_df = forecast_df.groupby(["Tarih", "Tür"], as_index=False)["Miktar"].sum()
 
     elif forecast_type == "Gider":
+        table_name = "Gider Tahmini"
+        y_name = "Gider"
         model = Prophet(yearly_seasonality=True, seasonality_prior_scale=0.1)
         forecast_df = df[df["Tür"] == "Gider"]
         forecast_df = forecast_df.groupby(["Tarih", "Tür"], as_index=False)["Miktar"].sum()
@@ -117,7 +121,6 @@ if option == "Veri Tahmini":
         forecast_df = df
         forecast_df.loc[forecast_df["Tür"] == "Gider", "Miktar"] *= -1
         forecast_df = forecast_df.groupby(["Tarih"], as_index=False)["Miktar"].sum()
-
 
     if forecast_type == "Gelir_Gider":
         gelir_model = Prophet(yearly_seasonality=True, seasonality_prior_scale=0.1)
@@ -170,6 +173,8 @@ if option == "Veri Tahmini":
         forecast = model.predict(future)
         
         if forecast_type == "Kâr":
+            table_name = "Kâr Tahmini"
+            y_name = "Kâr"
             below_zero = forecast.loc[forecast["yhat"] <= 0]
 
             st.header("Zararda olduğumuz aylar ve zarar miktarları")
@@ -188,9 +193,9 @@ if option == "Veri Tahmini":
         fig3.update_traces(marker=dict(color="white"))
 
         fig3.update_layout(
-            title="Gelir Tahmini",
+            title=table_name,
             xaxis_title="Tarih",
-            yaxis_title="Gelir",
+            yaxis_title=y_name,
             template="plotly_dark",
             showlegend=True,
             hovermode="x",
@@ -200,3 +205,50 @@ if option == "Veri Tahmini":
 
         fig2 = model.plot_components(forecast)
         st.write(fig2)
+
+if option == "Filtreleme":
+    kalem_col, altkalem_col, açıklama_col = st.columns([5, 5, 5])
+
+    with kalem_col:
+        kalem = st.selectbox("Kalem",  [" "] + df["Kalem"].unique().tolist())
+        if kalem != " ":
+            df = df[df["Kalem"] == kalem]
+
+    with altkalem_col:
+        alt_kalem = st.selectbox("Alt Kalem", [" "] + df["Alt Kalem"].unique().tolist())
+        if alt_kalem != " ":
+            df = df[df["Alt Kalem"] == alt_kalem]
+        
+    with açıklama_col:
+        açıklama = st.selectbox("İlgili Açıklama", [" "] + df["İlgili / Açıklama"].unique().tolist())
+        if açıklama != " " and açıklama is not None :
+            df = df[df["İlgili / Açıklama"] == açıklama]
+
+    miktar_col, ay_col, yıl_col, tür_col = st.columns([5, 5, 5, 5])
+
+    with miktar_col:
+        miktar = st.selectbox("Miktar", [" "] + df["Miktar"].unique().tolist())
+        if miktar != " ":
+            df = df[df["Miktar"] == miktar]
+            
+    with ay_col:
+        ay = st.selectbox("Ay", [" "] + df["Ay"].unique().tolist())
+        if ay != " ":
+            df = df[df["Ay"] == ay]
+
+    with yıl_col:
+        yıl = st.selectbox("Yıl", [" "] + df["Yıl"].unique().tolist())
+        if yıl != " ":
+            df = df[df["Yıl"] == yıl]
+        
+    with tür_col:
+        tür = st.selectbox("Tür", [" "] + df["Tür"].unique().tolist())
+        if tür != " ":
+            df = df[df["Tür"] == tür]
+
+    row_list = [["Kalem", kalem], ["Alt Kalem", alt_kalem], ["İlgili / Açıklama", açıklama], ["Miktar", miktar], 
+                ["Ay", ay], ["Yıl", yıl], ["Tür", tür]]
+
+    if st.button("Filtrele"):
+        st.write(df, width=1000)
+        
